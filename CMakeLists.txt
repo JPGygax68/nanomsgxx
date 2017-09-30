@@ -88,7 +88,7 @@ endif()
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/install/include)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/install/lib)
 
-target_link_libraries(nanomsgxx PRIVATE nanomsg)
+target_link_libraries(nanomsgxx PUBLIC nanomsg)
 
 install(DIRECTORY ${SOURCE_DIR} DESTINATION include/nnxx FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${SOURCE_DIR} DESTINATION include/nnxx FILES_MATCHING PATTERN "*.hpp")
