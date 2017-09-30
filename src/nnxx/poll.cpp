@@ -142,10 +142,10 @@ namespace nnxx {
   { return this->fd == s.fd(); }
 
   bool poll_entry::recv_ready() const noexcept
-  { return this->revents & EV_POLLIN; }
+  { return (this->revents & EV_POLLIN) != 0; }
 
   bool poll_entry::send_ready() const noexcept
-  { return this->revents & EV_POLLOUT; }
+  { return (this->revents & EV_POLLOUT) != 0; }
 
   bool operator==(const poll_entry &e, const socket &s) noexcept
   { return e.is(s); }
@@ -176,11 +176,11 @@ namespace nnxx {
 
   poll_vector &poll(poll_vector &entries, duration timeout, int flags)
   {
-    const int t = (timeout == duration::max())
+    auto t = static_cast<int>((timeout == duration::max())
       ? -1
-      : std::chrono::duration_cast<milliseconds>(timeout).count(); 
+      : std::chrono::duration_cast<milliseconds>(timeout).count());
 
-    const int n = poll(entries.data(), entries.size(), t);
+    const auto n = poll(entries.data(), entries.size(), t);
 
     if (n < 0) {
       const auto err = this_thread::get_errc();
