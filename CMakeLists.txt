@@ -64,28 +64,34 @@ if(WIN32)
 	target_compile_options(nanomsgxx PUBLIC /EHs)
 endif()
 
-# nanomsg library as external project
-include(ExternalProject)
-ExternalProject_Add(nanomsg_external
-  GIT_REPOSITORY        https://github.com/nanomsg/nanomsg.git
-  GIT_TAG               master
-  #URL                   ${CMAKE_CURRENT_SOURCE_DIR}/nanomsg
-  SOURCE_DIR            ${CMAKE_CURRENT_BINARY_DIR}/nanomsg
-  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install -DNN_STATIC_LIB=ON
-)
-add_library(nanomsg STATIC IMPORTED)
-add_dependencies(nanomsg nanomsg_external)
-# TODO: make platform-independent
-set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/install/lib/nanomsg.lib)
-#set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION nanomsg.lib)
-set_properties(TARGET nanomsg PROPERTIES INTERFACE_LINK_DIRECTORIES ${CMAKE_BINARY_DIR}/install/include)
-if (WIN32)
-    set_target_properties(nanomsg PROPERTIES INTERFACE_LINK_LIBRARIES "ws2_32;mswsock;advapi32")
+# Dependency: nanomsg static library
+# If nanomsg is not defined as a target, get it as an external project
+
+if (NOT TARGET nanomsg)
+  include(ExternalProject)
+  ExternalProject_Add(nanomsg_external
+    GIT_REPOSITORY        https://github.com/nanomsg/nanomsg.git
+    GIT_TAG               master
+    #URL                   ${CMAKE_CURRENT_SOURCE_DIR}/nanomsg
+    SOURCE_DIR            ${CMAKE_CURRENT_BINARY_DIR}/nanomsg
+    CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install -DNN_STATIC_LIB=ON
+  )
+  add_library(nanomsg STATIC IMPORTED)
+  add_dependencies(nanomsg nanomsg_external)
+  # TODO: make platform-independent
+  set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/install/lib/nanomsg.lib)
+  #set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION nanomsg.lib)
+  set_properties(TARGET nanomsg PROPERTIES INTERFACE_LINK_DIRECTORIES ${CMAKE_BINARY_DIR}/install/include)
+  if (WIN32)
+      set_target_properties(nanomsg PROPERTIES INTERFACE_LINK_LIBRARIES "ws2_32;mswsock;advapi32")
+  endif()
+  include_directories(${CMAKE_BINARY_DIR}/install/include)
+  link_directories(${CMAKE_BINARY_DIR}/install/lib)
 endif()
-include_directories(${CMAKE_BINARY_DIR}/install/include)
-link_directories(${CMAKE_BINARY_DIR}/install/lib)
 
 target_link_libraries(nanomsgxx PUBLIC nanomsg)
+
+# Installation 
 
 install(DIRECTORY ${SOURCE_DIR} DESTINATION include/nnxx FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${SOURCE_DIR} DESTINATION include/nnxx FILES_MATCHING PATTERN "*.hpp")
