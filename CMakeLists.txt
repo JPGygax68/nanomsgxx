@@ -76,8 +76,8 @@ ExternalProject_Add(nanomsg_external
 add_library(nanomsg STATIC IMPORTED)
 add_dependencies(nanomsg nanomsg_external)
 # TODO: make platform-independent
-#set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/nanomsg.lib)
-set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION nanomsg.lib)
+set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/install/lib/nanomsg.lib)
+#set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION nanomsg.lib)
 if (WIN32)
     set_target_properties(nanomsg PROPERTIES INTERFACE_LINK_LIBRARIES "ws2_32;mswsock;advapi32")
 endif()
