@@ -5,8 +5,6 @@ cmake_minimum_required( VERSION 3.0 )
 
 project( nanomsgcxx )
 
-get_filename_component(ROOT_DIR "../.." ABSOLUTE)
-
 SET(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/nnxx/)
 
 set(NANOMSGXX_SOURCES
@@ -73,20 +71,18 @@ ExternalProject_Add(nanomsg_external
   GIT_TAG               master
   #URL                   ${CMAKE_CURRENT_SOURCE_DIR}/nanomsg
   SOURCE_DIR            ${CMAKE_CURRENT_BINARY_DIR}/nanomsg
-  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install -DNN_STATIC_LIB=ON
+  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/install -DNN_STATIC_LIB=ON
 )
 add_library(nanomsg STATIC IMPORTED)
 add_dependencies(nanomsg nanomsg_external)
 # TODO: make platform-independent
 #set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/install/lib/nanomsg.lib)
 set_target_properties(nanomsg PROPERTIES IMPORTED_LOCATION nanomsg.lib)
-#set_property(TARGET LibA PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES LibC)
 if (WIN32)
     set_target_properties(nanomsg PROPERTIES INTERFACE_LINK_LIBRARIES "ws2_32;mswsock;advapi32")
 endif()
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/install/include)
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/install/lib)
+include_directories(${CMAKE_BINARY_DIR}/install/include)
+link_directories(${CMAKE_BINARY_DIR}/install/lib)
 
 target_link_libraries(nanomsgxx PUBLIC nanomsg)
 
